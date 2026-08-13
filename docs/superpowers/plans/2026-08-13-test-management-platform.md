@@ -4,9 +4,9 @@
 
 **Goal:** 在现有 Playwright 工程旁建设多项目测试管理台，完成需求到 AI 草稿、人工确认、自动化审核、选择执行和运行记录的第一期闭环。
 
-**Architecture:** pnpm workspace 包含 Next.js Web、NestJS API、独立 Runner 和共享契约。API 将版本、快照和审计记录写入 PostgreSQL；Redis/BullMQ 执行 AI 与测试任务；Runner 用固定批次快照和 Secret 调用项目指定 Playwright 仓库，结果和七天证据回写 API。
+**Architecture:** pnpm workspace 包含 Next.js Web、NestJS API、独立 Runner 和共享契约。当前本地模式将版本、快照和审计写入 Node 22 `node:sqlite`，以 SQL 迁移维护结构；任务队列使用进程内适配器，附件使用 `TEST_MANAGEMENT_DATA_DIR` 下的本地文件适配器。API/Runner 只依赖仓储、队列和对象存储边界，后续可替换为 PostgreSQL、Redis/BullMQ 和 MinIO/S3。
 
-**Tech Stack:** Node.js 22 LTS、pnpm、Next.js、NestJS、TypeScript、PostgreSQL、Prisma、Redis、BullMQ、MinIO/S3、Playwright、Docker Compose、Vitest。
+**Tech Stack:** Node.js 22 LTS、pnpm、Next.js、NestJS、TypeScript、`node:sqlite`、SQL migrations、进程内队列、本地文件存储、Playwright、Vitest。生产适配器可使用 PostgreSQL、Redis/BullMQ、MinIO/S3。
 
 ## Global Constraints
 
@@ -29,9 +29,8 @@ test-management-platform/
 ├─ apps/api/                 # NestJS API、队列生产者、清理任务
 ├─ apps/runner/              # BullMQ 消费者、健康检查、Playwright 执行
 ├─ packages/contracts/       # DTO、枚举、Zod schema
-├─ packages/database/        # Prisma schema、迁移、种子
+├─ packages/database/        # SQLite SQL 迁移、种子与仓储边界
 ├─ packages/ui/              # 状态徽标、表格、筛选组件
-├─ infra/docker-compose.yml  # PostgreSQL、Redis、MinIO
 └─ docs/runbooks/            # Secret、Runner、保留策略
 ```
 
@@ -64,9 +63,9 @@ test-management-platform/
 - Create: `test-management-platform/infra/docker-compose.yml`
 - Create: `test-management-platform/packages/contracts/src/index.ts`
 - Create: `test-management-platform/packages/contracts/test/lifecycle.spec.ts`
-- Create: `test-management-platform/packages/database/prisma/schema.prisma`
+- Create: `test-management-platform/packages/database/migrations/001_init.sql`
 
-**Interfaces:** PostgreSQL、Redis、MinIO 本地服务；共享状态枚举；Prisma Client；DEMO 项目、test 环境与 smoke 测试集种子。
+**Interfaces:** 本地 SQLite、进程内任务与本地证据存储适配器；共享状态枚举；DEMO 项目、test 环境与 smoke 测试集种子。运行目录由 `TEST_MANAGEMENT_DATA_DIR` 控制，默认 `D:\路径卷不可删\test-management-platform`；应用只能创建子目录，不能删除或重建该根目录。
 
 - [ ] **Step 1: 写失败的生命周期契约测试**
 
@@ -82,14 +81,14 @@ it('exposes executable lifecycle states', () => {
 Run: `pnpm --filter @platform/contracts test`  
 Expected: FAIL，找不到共享状态导出。
 
-- [ ] **Step 3: 创建 workspace、Compose 和 Prisma 迁移**
+- [ ] **Step 3: 创建 workspace 与 SQLite 迁移**
 
-Compose 启动 PostgreSQL 16、Redis 7、MinIO，端口仅绑定本机。实现上表模型、外键和索引；`project_id + case_code`、`functional_case_id + version_no` 必须唯一。创建迁移和 Demo 种子。
+使用 Node 22 `node:sqlite` 创建持久本地数据库。JSON 以 TEXT 保存，状态使用显式字符串 CHECK 约束；实现上表模型、外键和索引；`project_id + case_code`、`functional_case_id + version_no` 必须唯一。创建 SQL 迁移和 Demo 种子；代码经仓储、队列、对象存储边界隔离，以便替换生产适配器。
 
 - [ ] **Step 4: 验证并提交**
 
-Run: `docker compose -f infra/docker-compose.yml up -d && pnpm --filter @platform/database prisma migrate dev --name init && pnpm --filter @platform/contracts test`  
-Expected: 迁移成功，契约测试通过。
+Run: `pnpm --filter @platform/database test && pnpm --filter @platform/contracts test`
+Expected: SQLite 迁移与 Demo 种子通过，契约测试通过。
 
 ```bash
 git add test-management-platform
@@ -250,7 +249,7 @@ Expected: FAIL，批次 API 不存在。
 
 - [ ] **Step 3: 实现测试集、选择器与队列**
 
-固定集使用成员表，规则集支持 module、tags、priority、recentStatus。ALL 选择无开放影响的可执行用例；SUITE 和 SELECTED 验证同一项目。保存自动化版本、来源功能版本、路径、SHA、环境 URL、执行命令和排除原因的不可变快照，不保存 Secret。事务提交后向 Redis 只发送 batch ID。
+固定集使用成员表，规则集支持 module、tags、priority、recentStatus。ALL 选择无开放影响的可执行用例；SUITE 和 SELECTED 验证同一项目。保存自动化版本、来源功能版本、路径、SHA、环境 URL、执行命令和排除原因的不可变快照，不保存 Secret。事务提交后只向队列适配器发送 batch ID；本地模式使用进程内实现，生产可替换为 Redis。
 
 - [ ] **Step 4: 验证并提交**
 

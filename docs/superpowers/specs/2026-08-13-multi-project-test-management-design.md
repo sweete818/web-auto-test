@@ -18,6 +18,12 @@
 6. 每个执行批次保存用例版本、脚本提交号、环境、执行配置和实际入选用例快照；后续修改不改写历史。
 7. 凭据只保存于 Secret 存储；报告、截图、视频、Trace 和日志按项目及环境隔离，并在七天后自动清理。
 
+## 本地开发存储适配器
+
+第一期本地开发不依赖 Docker。数据通过 Node 22 内置 `node:sqlite` 保存，JSON 使用 TEXT 字段，状态字段使用显式字符串 `CHECK` 约束；SQL 迁移和种子在本机执行。任务调度和对象存储分别使用进程内队列与本地文件适配器。API 和 Runner 只能依赖仓储、队列、对象存储接口，生产环境可分别替换为 PostgreSQL、Redis/BullMQ、MinIO/S3，且不改变业务状态机。
+
+运行数据根目录由 `TEST_MANAGEMENT_DATA_DIR` 指定，默认值为 `D:\路径卷不可删\test-management-platform`。数据库位于其 `data/test-management.sqlite` 子目录，证据位于 `evidence/` 子目录。应用只可创建这些子目录；不得删除或重建该根目录。七天保留任务未来只能删除 `evidence/` 内已过期的应用证据文件。
+
 ## 3. 业务闭环
 
 ```text

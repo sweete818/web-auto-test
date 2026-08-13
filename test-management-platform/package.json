@@ -1,0 +1,14 @@
+{
+  "name": "test-management-platform",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.16.0",
+  "scripts": {
+    "test": "node scripts/run-workspace.mjs test",
+    "typecheck": "node scripts/run-workspace.mjs typecheck"
+  },
+  "devDependencies": {
+    "typescript": "5.8.3",
+    "vitest": "3.2.4"
+  }
+}
