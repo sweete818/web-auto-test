@@ -7,7 +7,7 @@ if (!['test', 'typecheck'].includes(mode)) throw new Error('Expected test or typ
 const node = process.execPath;
 const root = process.cwd();
 const argumentsByMode = mode === 'test'
-  ? [join(root, 'node_modules', 'vitest', 'vitest.mjs'), 'run', 'packages/contracts/test', 'packages/database/test']
+  ? [join(root, 'node_modules', 'vitest', 'vitest.mjs'), 'run']
   : [join(root, 'node_modules', 'typescript', 'lib', 'tsc.js'), '-p', 'tsconfig.json', '--noEmit'];
 const result = spawnSync(node, argumentsByMode, {
   stdio: 'inherit',

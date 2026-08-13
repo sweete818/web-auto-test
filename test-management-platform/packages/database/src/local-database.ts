@@ -40,6 +40,8 @@ export class LocalDatabase {
   environment(code: string, name: string) { return this.db.prepare('SELECT e.* FROM environments e JOIN projects p ON p.id=e.project_id WHERE p.code=? AND e.name=?').get(code, name); }
   testSuite(code: string, name: string) { return this.db.prepare('SELECT s.* FROM test_suites s JOIN projects p ON p.id=s.project_id WHERE p.code=? AND s.name=?').get(code, name); }
   tableColumns(table: string): string[] { return (this.db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]).map((column) => column.name); }
+  run(sql: string, ...values: any[]) { return this.db.prepare(sql).run(...values); }
+  get<T>(sql: string, ...values: any[]): T | undefined { return this.db.prepare(sql).get(...values) as T | undefined; }
   appliedMigrations(): string[] { return (this.db.prepare('SELECT id FROM schema_migrations ORDER BY id').all() as { id: string }[]).map((row) => row.id); }
   insertCrossProjectVersion() {
     const demo = this.projectByCode('DEMO')!; const other = this.projectByCode('OTHER')!; const timestamp = now();
