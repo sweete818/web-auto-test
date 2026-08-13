@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join, posix } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
-import { databasePath } from './data-directory.js';
+import { databasePath } from './data-directory.ts';
 
 const migrationPath = join(import.meta.dirname, '..', 'migrations', '001_init.sql');
 const now = () => new Date().toISOString();
@@ -56,6 +56,7 @@ export class LocalDatabase {
   tableColumns(table: string): string[] { return (this.db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]).map((column) => column.name); }
   run(sql: string, ...values: any[]) { return this.db.prepare(sql).run(...values); }
   get<T>(sql: string, ...values: any[]): T | undefined { return this.db.prepare(sql).get(...values) as T | undefined; }
+  all<T>(sql: string, ...values: any[]): T[] { return this.db.prepare(sql).all(...values) as T[]; }
   appliedMigrations(): string[] { return (this.db.prepare('SELECT id FROM schema_migrations ORDER BY id').all() as { id: string }[]).map((row) => row.id); }
   insertCrossProjectVersion() {
     const demo = this.projectByCode('DEMO')!; const other = this.projectByCode('OTHER')!; const timestamp = now();
