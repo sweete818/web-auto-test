@@ -14,7 +14,7 @@ function fixture() {
   const other = db.createProject('WEB-B', '网页项目 B');
   const now = '2026-08-13T09:00:00.000Z';
   const environmentId = 'env-a';
-  db.run('INSERT INTO environments VALUES (?,?,?,?,?,?,?,?)', environmentId, project.id, '测试环境', 'http://test.local', '{}', 'secret://test', now, now);
+  db.run('INSERT INTO environments VALUES (?,?,?,?,?,?,?,?)', environmentId, project.id, '预发环境', 'http://test.local', '{}', 'secret://test', now, now);
   db.run('INSERT INTO functional_cases (id,project_id,case_code,module,scenario,priority,test_type,status,created_by,created_at,updated_at,current_version_no) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 'fc-a', project.id, 'TC-WEB-001', '登录', '成功登录', 'P1', 'FUNCTION', 'CONFIRMED', 'tester', now, now, 1);
   db.run('INSERT INTO functional_cases (id,project_id,case_code,module,scenario,priority,test_type,status,created_by,created_at,updated_at,current_version_no) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 'fc-b', other.id, 'TC-OTHER-001', '其它', '隔离', 'P1', 'FUNCTION', 'CONFIRMED', 'tester', now, now, 1);
   db.run('INSERT INTO project_repositories VALUES (?,?,?,?,?,?,?,?)', 'repo-a', project.id, 'repo://a', 'main', 'tests', 'tester', now, now);
@@ -44,10 +44,15 @@ it('renders project-scoped tables and excludes stale automation from the selecto
   expect(selector).toContain('badge badge-executable');
   expect(selector).toContain('class="nav-text"');
   expect(selector).toContain('aria-label="执行中心"');
+  expect(selector).toContain('class="run-layout"');
+  expect(selector).toContain('class="execution-summary"');
+  expect(selector).toContain('预发环境');
+  expect(selector).toContain('class="nav-icon" aria-hidden="true"');
   expect(selector).toContain(`/projects/${project.id}/cases`);
   const cases = await (await fetch(`${app.url}/projects/${project.id}/cases`)).text();
   expect(cases).toContain('TC-WEB-001');
   expect(cases).toContain('已确认');
+  expect(cases).toContain('class="list-toolbar"');
   const automation = await (await fetch(`${app.url}/projects/${project.id}/automation`)).text();
   expect(automation).toContain('可执行');
   const impacts = await (await fetch(`${app.url}/projects/${project.id}/impacts`)).text();
@@ -55,6 +60,10 @@ it('renders project-scoped tables and excludes stale automation from the selecto
   const otherPage = await (await fetch(`${app.url}/projects/${other.id}/cases`)).text();
   expect(otherPage).toContain('TC-OTHER-001');
   expect(otherPage).not.toContain('TC-WEB-001');
+
+  const dashboard = await (await fetch(`${app.url}/projects/${project.id}`)).text();
+  expect(dashboard).toContain('class="dashboard-grid"');
+  expect(dashboard).toContain('class="quick-actions"');
 });
 
 it('creates a selected run and filters the project run records', async () => {
