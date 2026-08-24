@@ -55,6 +55,14 @@ it('renders project-scoped tables and excludes stale automation from the selecto
   expect(cases).toContain('TC-WEB-001');
   expect(cases).toContain('已确认');
   expect(cases).toContain('class="list-toolbar"');
+  expect(cases).toContain('新建用例');
+  expect(cases).toContain(`/projects/${project.id}/cases/fc-a`);
+  const detail = await (await fetch(`${app.url}/projects/${project.id}/cases/fc-a`)).text();
+  expect(detail).toContain('前置条件');
+  expect(detail).toContain('测试步骤');
+  expect(detail).toContain('预期结果');
+  expect(detail).toContain('成功');
+  expect(detail).toContain('2026-08-13T09:00:00.000Z');
   const automation = await (await fetch(`${app.url}/projects/${project.id}/automation`)).text();
   expect(automation).toContain('可执行');
   const impacts = await (await fetch(`${app.url}/projects/${project.id}/impacts`)).text();
@@ -79,4 +87,34 @@ it('creates a selected run and filters the project run records', async () => {
   expect(matching).toContain('v1.2.0');
   const empty = await (await fetch(`${app.url}/projects/${project.id}/runs?version=missing`)).text();
   expect(empty).toContain('暂无记录');
+});
+
+it('creates, edits and confirms functional cases from the web console', async () => {
+  const { db, project } = fixture();
+  const app = await startWeb(0, db); stop = app.stop;
+  const created = await fetch(`${app.url}/projects/${project.id}/cases/new`, {
+    method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: 'caseCode=TC-WEB-NEW&module=%E8%AE%A2%E5%8D%95&scenario=%E5%88%9B%E5%BB%BA%E8%AE%A2%E5%8D%95&precondition=%E5%B7%B2%E7%99%BB%E5%BD%95&steps=%E8%BF%9B%E5%85%A5%E4%B8%8B%E5%8D%95%E9%A1%B5%0A%E6%8F%90%E4%BA%A4%E8%AE%A2%E5%8D%95&expectedResult=%E8%AE%A2%E5%8D%95%E5%88%9B%E5%BB%BA%E6%88%90%E5%8A%9F&priority=P1&testType=FUNCTION&automationRecommendation=on'
+  });
+  expect(created.status).toBe(302);
+  const inserted = db.get<any>('SELECT * FROM functional_cases WHERE project_id=? AND case_code=?', project.id, 'TC-WEB-NEW');
+  expect(inserted).toMatchObject({ status: 'DRAFT', precondition: '已登录', expected_result: '订单创建成功' });
+  expect(JSON.parse(inserted.steps)).toEqual(['进入下单页', '提交订单']);
+
+  const edited = await fetch(`${app.url}/projects/${project.id}/cases/fc-a`, {
+    method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: 'module=%E7%99%BB%E5%BD%95&scenario=%E6%96%B0%E7%99%BB%E5%BD%95&precondition=%E8%B4%A6%E5%8F%B7%E5%AD%98%E5%9C%A8&steps=%E8%BE%93%E5%85%A5%E8%B4%A6%E5%8F%B7&expectedResult=%E8%BF%9B%E5%85%A5%E9%A6%96%E9%A1%B5&priority=P0&testType=FUNCTION&automationRecommendation=on&changeReason=%E8%A1%A5%E5%85%85%E6%AD%A5%E9%AA%A4'
+  });
+  expect(edited.status).toBe(302);
+  expect(db.get<any>('SELECT status,scenario FROM functional_cases WHERE id=?', 'fc-a')).toMatchObject({ status: 'DRAFT', scenario: '新登录' });
+  const confirmed = await fetch(`${app.url}/projects/${project.id}/cases/fc-a/confirm`, {
+    method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: 'changeReason=%E7%A1%AE%E8%AE%A4%E6%9B%B4%E6%96%B0'
+  });
+  expect(confirmed.status).toBe(302);
+  expect(db.get<any>('SELECT status,current_version_no FROM functional_cases WHERE id=?', 'fc-a')).toMatchObject({ status: 'CONFIRMED', current_version_no: 2 });
+  const duplicateConfirm = await fetch(`${app.url}/projects/${project.id}/cases/fc-a/confirm`, {
+    method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: 'changeReason=%E9%87%8D%E5%A4%8D%E7%A1%AE%E8%AE%A4'
+  });
+  expect(duplicateConfirm.status).toBe(409);
+  expect(db.get<any>('SELECT current_version_no FROM functional_cases WHERE id=?', 'fc-a')?.current_version_no).toBe(2);
 });

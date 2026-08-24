@@ -32,6 +32,7 @@ function page(project: Row, title: string, content: string, section: string) {
   return `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(title)} - 测试管理台</title>
 <style>
+.primary-link{display:inline-flex;align-items:center;padding:9px 12px;border-radius:8px;background:#536dfe;color:#fff;font-weight:750;text-decoration:none;box-shadow:0 8px 16px #536dfe30}.table-link{color:#465fdc;font-weight:750;text-decoration:none}.case-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}.case-editor,.case-meta{padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:0 7px 25px #20335b0a}.form-notice{margin-bottom:18px;padding:12px 14px;border-left:3px solid #7e8cff;border-radius:0 9px 9px 0;background:#f4f5ff;color:#4854a0}.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.field-grid label{display:grid;gap:7px}.field-full{grid-column:1/-1}.field-grid textarea,.field-grid select{width:100%;padding:10px;border:1px solid #d7deeb;border-radius:8px;background:#fff;font:inherit;resize:vertical}.field-grid textarea:focus,.field-grid select:focus{outline:3px solid #dfe4ff;border-color:#7184f7}.field-grid small{color:var(--muted);font-weight:400}.check-field{display:flex!important;align-items:center;gap:8px}.case-readonly{display:grid;gap:7px;color:#46546c;font-weight:600}.case-readonly b{padding:10px;border-radius:8px;background:#f5f7fb;color:var(--ink)}.form-actions{display:flex;align-items:center;gap:10px;margin-top:20px}.case-meta h2{margin:0 0 14px;font-size:16px}.confirm-form{display:grid;gap:10px;margin-top:16px}.confirm-form label{display:grid;gap:7px}.confirm-form input{width:100%}.case-meta table{font-size:12px}.case-meta td,.case-meta th{padding:9px}@media(max-width:1000px){.case-layout{grid-template-columns:1fr}.case-side{display:grid;grid-template-columns:1fr 1fr;gap:16px}.case-side .case-meta[style]{margin-top:0!important}}@media(max-width:640px){.field-grid,.case-side{grid-template-columns:1fr}.form-actions{flex-wrap:wrap}.form-actions .toolbar-spacer{display:none}}
 :root{--ink:#17233a;--muted:#72809a;--line:#e6ebf3;--surface:#fff;--canvas:#f6f8fc;--brand:#536dfe;--brand-dark:#24304b;--green:#137a55;--green-bg:#e8f7f0;--amber:#ae6700;--amber-bg:#fff4df;--violet:#6846d9;--violet-bg:#f1edff}
 *{box-sizing:border-box}body{margin:0;font:14px/1.45 Inter,system-ui,"Microsoft YaHei",sans-serif;background:var(--canvas);color:var(--ink)}.app-shell{min-height:100vh;display:flex}.sidebar{width:248px;flex:none;background:linear-gradient(180deg,#1c2944 0%,#101a2e 100%);color:#d9e3f6;padding:24px 14px;display:flex;flex-direction:column}.brand{display:flex;align-items:center;gap:10px;margin:0 8px 34px;color:#fff;font-size:17px;font-weight:750}.brand-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#798cff,#ae9aff);box-shadow:0 7px 20px #0004}.project-chip{margin:0 7px 20px;padding:12px;border:1px solid #43536f;background:#253653;border-radius:10px}.project-chip small{display:block;color:#9fb0cb;margin-bottom:2px}.project-chip strong{color:#fff}.nav-label{margin:12px 10px 8px;font-size:11px;letter-spacing:.09em;color:#8292ad}.nav-item{display:flex;align-items:center;gap:11px;margin:3px 0;padding:10px 12px;color:#bdcbe3;text-decoration:none;border-radius:8px;font-weight:600}.nav-item:hover{background:#263958;color:#fff}.nav-item.active{background:linear-gradient(90deg,#536dfe,#6277ec);color:#fff;box-shadow:0 8px 18px #0a10233d}.nav-icon{display:inline-block;width:16px;text-align:center;color:inherit}.sidebar-footer{margin:auto 8px 0;padding-top:18px;border-top:1px solid #34445f;font-size:12px;color:#8d9db8}.workspace{min-width:0;flex:1}.workspace-header{height:78px;display:flex;align-items:center;justify-content:space-between;padding:0 42px;background:#fff;border-bottom:1px solid var(--line)}.breadcrumb{color:var(--muted);font-size:13px}.breadcrumb b{color:var(--ink)}.header-actions{display:flex;align-items:center;gap:12px}.environment{padding:7px 10px;border-radius:999px;background:#eef2ff;color:#4056c5;font-weight:650;font-size:12px}.avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#202e49;color:#fff;font-size:12px;font-weight:800}.content{max-width:1240px;margin:0 auto;padding:34px 42px 52px}.page-title{margin:0;font-size:27px;letter-spacing:-.03em}.page-subtitle{margin:5px 0 28px;color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.card{padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:0 7px 25px #20335b0a}.card-label{font-size:13px;color:var(--muted)}.card b{display:block;margin-top:7px;font-size:29px;letter-spacing:-.04em}.section-heading{display:flex;align-items:center;justify-content:space-between;margin:30px 0 10px}.section-heading h2{margin:0;font-size:16px}.panel{padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:0 7px 25px #20335b0a}table{width:100%;border-collapse:separate;border-spacing:0;margin-top:14px;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:var(--surface)}th{padding:12px 14px;background:#f8faff;color:#6a7891;font-size:12px;font-weight:750;letter-spacing:.02em;text-align:left;border-bottom:1px solid var(--line)}td{padding:14px;border-bottom:1px solid var(--line);vertical-align:middle}tr:last-child td{border-bottom:0}tbody tr:hover td{background:#fbfcff}.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;font-size:12px;font-weight:750}.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}.badge-executable,.badge-confirmed,.badge-approved,.badge-completed{color:var(--green);background:var(--green-bg)}.badge-needs-update,.badge-pending,.badge-open{color:var(--amber);background:var(--amber-bg)}.badge-draft,.badge-review{color:var(--violet);background:var(--violet-bg)}.muted{color:var(--muted)}.empty{padding:34px;text-align:center;color:var(--muted)}button{border:0;border-radius:9px;padding:10px 16px;background:linear-gradient(135deg,#536dfe,#6277ec);color:#fff;font:inherit;font-weight:750;cursor:pointer;box-shadow:0 8px 16px #536dfe30}button:hover{filter:brightness(1.04)}input{padding:9px 10px;border:1px solid #d7deeb;border-radius:8px;background:#fff;font:inherit}input:focus{outline:3px solid #dfe4ff;border-color:#7184f7}input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}label{color:#46546c;font-weight:600}.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.toolbar .spacer{flex:1}.run-notice{margin-bottom:16px;padding:13px 15px;border-left:3px solid #7e8cff;background:#f4f5ff;border-radius:0 9px 9px 0;color:#4854a0}.ok{color:var(--green)}.warn{color:var(--amber)}@media(max-width:800px){.sidebar{width:68px;padding:16px 8px}.brand>span:last-child,.project-chip,.nav-label,.nav-text{display:none}.brand{margin:0 10px 24px}.nav-item{justify-content:center;padding:10px}.nav-icon{font-size:16px}.workspace-header{padding:0 20px}.content{padding:26px 20px}.cards{grid-template-columns:1fr}.sidebar-footer{display:none}}
 </style><style>
@@ -49,6 +50,19 @@ async function formBody(request: IncomingMessage) {
     chunks.push(data);
   }
   return new URLSearchParams(Buffer.concat(chunks).toString('utf8'));
+}
+
+function functionalCaseInput(form: URLSearchParams, includeCode = false) {
+  const text = (name: string) => String(form.get(name) ?? '').trim();
+  const input = {
+    module: text('module'), scenario: text('scenario'), precondition: text('precondition'),
+    steps: text('steps').split(/\r?\n/).map((step) => step.trim()).filter(Boolean),
+    expectedResult: text('expectedResult'), priority: text('priority') || 'P1', testType: text('testType') || 'FUNCTION',
+    automationRecommendation: form.get('automationRecommendation') === 'on', changeReason: text('changeReason')
+  } as Record<string, unknown>;
+  if (includeCode) input.caseCode = text('caseCode');
+  if (!input.module || !input.scenario || !input.expectedResult || !(input.steps as string[]).length || (includeCode && !input.caseCode)) throw new Error('请完整填写用例编号、模块、场景、步骤和预期结果');
+  return input;
 }
 
 function seedPreview(db: LocalDatabase) {
@@ -91,11 +105,36 @@ function statusBadge(status: unknown) {
   return `<span class="badge badge-${className}">${escapeHtml(label)}</span>`;
 }
 
+function stepLines(value: unknown) {
+  try { return JSON.parse(String(value ?? '[]')); } catch { return []; }
+}
+
+function functionalCaseEditor(project: Row, item?: Row, versions: Row[] = []) {
+  const isNew = !item;
+  const value = (key: string) => escapeHtml(item?.[key] ?? '');
+  const steps = escapeHtml(stepLines(item?.steps).join('\n'));
+  const option = (current: string, candidate: string) => current === candidate ? ' selected' : '';
+  const currentPriority = String(item?.priority ?? 'P1');
+  const currentType = String(item?.test_type ?? 'FUNCTION');
+  const action = isNew ? projectUrl(project, '/cases/new') : projectUrl(project, `/cases/${item.id}`);
+  const history = versions.length ? table(['版本', '场景', '确认时间'], versions.map((version) => [`v${escapeHtml(version.versionNo)}`, escapeHtml(version.scenario), escapeHtml(version.confirmedAt ?? '—')])) : '<p class="muted">尚未确认，因此还没有版本记录。</p>';
+  const confirmAction = !isNew && item.status === 'DRAFT' ? `<form class="confirm-form" method="post" action="${projectUrl(project, `/cases/${item.id}/confirm`)}"><label>确认说明 <input name="changeReason" required placeholder="例如：补充登录失败场景"></label><button type="submit">确认并生成版本</button></form>` : '';
+  const notice = isNew ? '保存后会创建为草稿；确认后才进入正式用例库。' : item.status === 'CONFIRMED' ? '再次保存会产生待确认草稿，已确认版本仍会被保留。' : '当前是草稿。填写确认说明后，可生成正式版本。';
+  return `<div class="case-layout"><section class="case-editor"><div class="form-notice">${notice}</div><form method="post" action="${action}"><div class="field-grid">${isNew ? `<label>用例编号 <input name="caseCode" required value="${value('case_code')}" placeholder="例如 TC-LG-002"></label>` : `<div class="case-readonly"><span>用例编号</span><b>${value('case_code')}</b></div>`}<label>所属模块 <input name="module" required value="${value('module')}" placeholder="例如：登录"></label><label>测试场景 <input name="scenario" required value="${value('scenario')}" placeholder="例如：账号密码登录"></label><label>优先级 <select name="priority"><option${option(currentPriority, 'P0')}>P0</option><option${option(currentPriority, 'P1')}>P1</option><option${option(currentPriority, 'P2')}>P2</option><option${option(currentPriority, 'P3')}>P3</option></select></label><label>用例类型 <select name="testType"><option value="FUNCTION"${option(currentType, 'FUNCTION')}>功能测试</option><option value="REGRESSION"${option(currentType, 'REGRESSION')}>回归测试</option></select></label><label class="field-full">前置条件 <textarea name="precondition" rows="3" placeholder="例如：已创建可用测试账号">${value('precondition')}</textarea></label><label class="field-full">测试步骤 <textarea name="steps" rows="6" required placeholder="一行填写一个步骤&#10;例如：输入用户名&#10;输入密码并点击登录">${steps}</textarea><small>一行一个步骤，保存后会按顺序记录。</small></label><label class="field-full">预期结果 <textarea name="expectedResult" rows="4" required placeholder="例如：进入系统首页并显示用户名">${value('expected_result')}</textarea></label><label class="check-field"><input type="checkbox" name="automationRecommendation"${item?.automation_recommendation ? ' checked' : ''}> 建议转换为自动化用例</label>${!isNew ? `<label class="field-full">本次修改说明 <input name="changeReason" placeholder="例如：补充异常操作步骤"></label>` : ''}</div><div class="form-actions"><a class="secondary-button" href="${projectUrl(project, '/cases')}">返回列表</a><span class="toolbar-spacer"></span><button type="submit">${isNew ? '保存为草稿' : '保存修改'}</button></div></form></section><aside class="case-side"><section class="case-meta"><h2>${isNew ? '新建功能用例' : '用例状态'}</h2>${isNew ? '<p class="muted">新用例需要人工确认后才成为正式版本。</p>' : `<div class="summary-row"><span>当前状态</span><b>${statusBadge(item.status)}</b></div><div class="summary-row"><span>当前版本</span><b>v${escapeHtml(item.current_version_no ?? '—')}</b></div><div class="summary-row"><span>自动化建议</span><b>${item.automation_recommendation ? '建议' : '暂不建议'}</b></div>${confirmAction}`}</section>${isNew ? '' : `<section class="case-meta" style="margin-top:16px"><h2>历史版本</h2>${history}</section>`}</aside></div>`;
+}
+
 function renderSection(db: LocalDatabase, project: Row, section: string, url: URL) {
+  if (section === 'cases/new') return ['新建功能用例', functionalCaseEditor(project)] as const;
+  const caseDetail = section.match(/^cases\/([^/]+)$/);
+  if (caseDetail) {
+    const item = db.get<Row>('SELECT * FROM functional_cases WHERE id=? AND project_id=?', caseDetail[1], project.id);
+    if (!item) return ['功能用例', '<div class="panel empty">未找到该功能用例。</div>'] as const;
+    return ['功能用例详情', functionalCaseEditor(project, item, db.caseVersions(item.id, project.id))] as const;
+  }
   if (section === 'cases') {
-    const cases = db.all<Row>('SELECT case_code,module,scenario,status,current_version_no FROM functional_cases WHERE project_id=? ORDER BY case_code', project.id);
-    const toolbar = `<div class="list-toolbar"><div><strong>功能用例库</strong><div class="toolbar-meta">共 ${cases.length} 条，可确认、版本化并追踪自动化影响</div></div><span class="toolbar-spacer"></span><a class="secondary-button" href="${projectUrl(project, '/automation')}">查看自动化</a></div>`;
-    return ['功能用例', `${toolbar}${table(['编号', '模块', '场景', '状态', '版本'], cases.map((item) => [escapeHtml(item.case_code), escapeHtml(item.module), escapeHtml(item.scenario), statusBadge(item.status), `v${escapeHtml(item.current_version_no ?? '—')}`]))}`] as const;
+    const cases = db.all<Row>('SELECT id,case_code,module,scenario,status,current_version_no FROM functional_cases WHERE project_id=? ORDER BY case_code', project.id);
+    const toolbar = `<div class="list-toolbar"><div><strong>功能用例库</strong><div class="toolbar-meta">共 ${cases.length} 条，可确认、版本化并追踪自动化影响</div></div><span class="toolbar-spacer"></span><a class="secondary-button" href="${projectUrl(project, '/automation')}">查看自动化</a><a class="primary-link" href="${projectUrl(project, '/cases/new')}">＋ 新建用例</a></div>`;
+    return ['功能用例', `${toolbar}${table(['编号', '模块', '场景', '状态', '版本', '操作'], cases.map((item) => [escapeHtml(item.case_code), escapeHtml(item.module), escapeHtml(item.scenario), statusBadge(item.status), `v${escapeHtml(item.current_version_no ?? '—')}`, `<a class="table-link" href="${projectUrl(project, `/cases/${item.id}`)}">查看 / 编辑</a>`]))}`] as const;
   }
   if (section === 'automation') {
     const items = db.all<Row>('SELECT case_code,level,review_status,execution_status,current_version_no FROM automation_cases WHERE project_id=? ORDER BY case_code', project.id);
@@ -146,6 +185,30 @@ export async function startWeb(port = 0, database?: LocalDatabase) {
       const project = projectKey && db.get<Row>('SELECT * FROM projects WHERE id=? OR code=?', projectKey, projectKey);
       if (!project) { response.writeHead(404).end('项目不存在'); return; }
       const section = match?.[2] ?? '';
+      if (request.method === 'POST' && section === 'cases/new') {
+        const created = db.createFunctionalCase(project.id, functionalCaseInput(await formBody(request), true), 'web-console');
+        response.writeHead(302, { location: projectUrl(project, `/cases/${created.id}`) }).end();
+        return;
+      }
+      const caseConfirm = section.match(/^cases\/([^/]+)\/confirm$/);
+      if (request.method === 'POST' && caseConfirm) {
+        const item = db.get<Row>('SELECT id,status FROM functional_cases WHERE id=? AND project_id=?', caseConfirm[1], project.id);
+        if (!item) { response.writeHead(404).end('用例不存在'); return; }
+        if (item.status !== 'DRAFT') { response.writeHead(409).end('只有草稿用例可以确认'); return; }
+        const reason = String((await formBody(request)).get('changeReason') ?? '').trim();
+        if (!reason) throw new Error('请填写确认说明');
+        db.confirmCase(item.id, reason, 'web-console');
+        response.writeHead(302, { location: projectUrl(project, `/cases/${item.id}`) }).end();
+        return;
+      }
+      const caseEdit = section.match(/^cases\/([^/]+)$/);
+      if (request.method === 'POST' && caseEdit) {
+        const item = db.get<Row>('SELECT id FROM functional_cases WHERE id=? AND project_id=?', caseEdit[1], project.id);
+        if (!item) { response.writeHead(404).end('用例不存在'); return; }
+        db.updateCaseDraft(item.id, functionalCaseInput(await formBody(request)), 'web-console');
+        response.writeHead(302, { location: projectUrl(project, `/cases/${item.id}`) }).end();
+        return;
+      }
       if (request.method === 'POST' && section === 'runs/new') {
         const selectedIds = formBody(request).then((form) => form.getAll('case'));
         const environment = db.get<Row>('SELECT id FROM environments WHERE project_id=? ORDER BY name LIMIT 1', project.id);
