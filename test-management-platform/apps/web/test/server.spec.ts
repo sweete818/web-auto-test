@@ -32,7 +32,9 @@ afterEach(async () => stop?.());
 it('renders project-scoped tables and excludes stale automation from the selector', async () => {
   const { db, project, other } = fixture();
   const app = await startWeb(0, db); stop = app.stop;
-  const selector = await (await fetch(`${app.url}/projects/${project.id}/runs/new`)).text();
+  const selectorResponse = await fetch(`${app.url}/projects/${project.id}/runs/new`);
+  expect(selectorResponse.headers.get('content-security-policy')).toContain("style-src 'self' 'unsafe-inline'");
+  const selector = await selectorResponse.text();
   expect(selector).toContain('AT-WEB-001');
   expect(selector).toContain('AT-WEB-002');
   expect(selector).toContain('badge-needs-update');

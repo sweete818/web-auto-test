@@ -131,7 +131,7 @@ function renderSection(db: LocalDatabase, project: Row, section: string, url: UR
 }
 
 function sendHtml(response: ServerResponse, html: string, status = 200) {
-  response.writeHead(status, { 'content-type': 'text/html; charset=utf-8', 'content-security-policy': "default-src 'self'; script-src 'unsafe-inline'", 'x-content-type-options': 'nosniff' }).end(html);
+  response.writeHead(status, { 'content-type': 'text/html; charset=utf-8', 'content-security-policy': "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'unsafe-inline'", 'x-content-type-options': 'nosniff' }).end(html);
 }
 
 export async function startWeb(port = 0, database?: LocalDatabase) {
